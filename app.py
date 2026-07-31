@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import json
 
 from services.pdf_reader import (save_uploaded_file, extract_text_from_pdf, clean_text)
 from services.database import (save_resume, get_all_resumes)
@@ -78,21 +79,25 @@ if analyze_button:
                 Job Description:
                 {jd_text}
 
-                Provide your response in this exact format:
+                Return ONLY valid JSON.
 
-                1. Overall Match Percentage (0-100) : 
+                Format:
 
-                2. Strengths
-                - Bullet points
+                {{
+                    "match_percentage": 0,
+                    "strengths": [],
+                    "missing_skills": [],
+                    "recommendations": []
+                }}
 
-                3. Missing Skills
-                - Bullet points
-
-                4. Recommendations
-                - Bullet points
+                Do not include markdown.
+                Do not include explanations.
+                Return JSON only.
                 """
 
         analysis = ask_llm(prompt)
+
+        analysis = json.loads(analysis)
 
         st.success(f"Files uploaded and saved successfully! Resume ID: {resume.id}")
 
@@ -137,4 +142,22 @@ if analyze_button:
 
         st.subheader("🤖 AI Analysis")
 
-        st.markdown(analysis)
+        st.metric(
+            "Match Percentage",
+            f"{analysis['match_percentage']}%"
+        )
+
+        st.subheader("✅ Strengths")
+
+        for item in analysis["strengths"]:
+            st.write(f"• {item}")
+
+        st.subheader("❌ Missing Skills")
+
+        for item in analysis["missing_skills"]:
+            st.write(f"• {item}")
+
+        st.subheader("💡 Recommendations")
+
+        for item in analysis["recommendations"]:
+            st.write(f"• {item}")
