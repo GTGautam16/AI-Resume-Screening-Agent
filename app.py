@@ -1,9 +1,7 @@
 import streamlit as st
 import pandas as pd
 
-from services.pdf_reader import (save_uploaded_file, 
-                                 extract_text_from_pdf, 
-                                 clean_text)
+from services.pdf_reader import (save_uploaded_file, extract_text_from_pdf, clean_text)
 from services.database import (save_resume, get_all_resumes)
 
 st.set_page_config(
@@ -67,6 +65,35 @@ if analyze_button:
                 jd_text
                 )
 
+        from services.llm import ask_llm
+
+        prompt = f"""
+                You are an expert AI Resume Screening Assistant.
+
+                Compare the following resume against the job description.
+
+                Resume:
+                {resume_text}
+
+                Job Description:
+                {jd_text}
+
+                Provide your response in this exact format:
+
+                1. Overall Match Percentage (0-100) : 
+
+                2. Strengths
+                - Bullet points
+
+                3. Missing Skills
+                - Bullet points
+
+                4. Recommendations
+                - Bullet points
+                """
+
+        analysis = ask_llm(prompt)
+
         st.success(f"Files uploaded and saved successfully! Resume ID: {resume.id}")
 
         all_resumes = get_all_resumes()
@@ -107,3 +134,7 @@ if analyze_button:
             jd_text,
             height=300
         )
+
+        st.subheader("🤖 AI Analysis")
+
+        st.markdown(analysis)
