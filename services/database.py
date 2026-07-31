@@ -2,6 +2,7 @@ import os
 
 from dotenv import load_dotenv
 
+from sqlalchemy import and_
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -76,6 +77,28 @@ def get_all_resumes():
     try:
         resumes = session.query(Resume).all()
         return resumes
+
+    finally:
+        session.close()
+
+def resume_exists(resume_path,jd_path):
+    from models.schemas import Resume
+
+    session = SessionLocal()
+
+    try:
+        resume = (
+            session.query(Resume)
+            .filter(
+                and_(
+                    Resume.resume_path == str(resume_path),
+                    Resume.jd_path == str(jd_path)
+                )
+            )
+            .first()
+        )
+
+        return resume
 
     finally:
         session.close()

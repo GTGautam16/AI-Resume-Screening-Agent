@@ -3,7 +3,7 @@ import pandas as pd
 import json
 
 from services.pdf_reader import (save_uploaded_file, extract_text_from_pdf, clean_text)
-from services.database import (save_resume, get_all_resumes)
+from services.database import (save_resume, get_all_resumes, resume_exists)
 
 st.set_page_config(
     page_title="AI Resume Screening Agent",
@@ -92,6 +92,12 @@ if analyze_button:
 
         analysis = json.loads(analysis)
 
+        existing_resume = resume_exists(resume_path,jd_path)
+
+        if existing_resume:
+            st.warning("This Resume and Job Description have already been analyzed.")
+            st.stop()
+            
         resume = save_resume(
             resume_path,
             jd_path,
