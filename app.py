@@ -93,62 +93,47 @@ if analyze_button:
         analysis = json.loads(analysis)
 
         resume = save_resume(
-                        resume_path,
-                        jd_path,
-                        resume_text,
-                        jd_text, 
-        
-                        analysis["match_percentage"],
-        
-                        "\n".join(analysis["strengths"]),
-        
-                        "\n".join(analysis["missing_skills"]),
-        
-                        "\n".join(analysis["recommendations"])
-                    )
-
-        st.success(f"Files uploaded and saved successfully! Resume ID: {resume.id}")
-
-        all_resumes = get_all_resumes()
-
-        st.subheader("Stored Resumes")
-
-        resume_data = []
-
-        for resume in all_resumes:
-            resume_data.append(
-                {
-                    "ID": resume.id,
-                    "Resume Path": resume.resume_path,
-                    "Uploaded At": resume.created_at
-                }
-            )
-
-        df = pd.DataFrame(resume_data)
-
-        st.dataframe(
-            df,
-            use_container_width=True,
-            hide_index=True
+            resume_path,
+            jd_path,
+            resume_text,
+            jd_text,
+            analysis["match_percentage"],
+            "\n".join(analysis["strengths"]),
+            "\n".join(analysis["missing_skills"]),
+            "\n".join(analysis["recommendations"])
         )
-        
-        st.subheader("Resume Text")
+
+        st.success(
+            f"Files uploaded and saved successfully! Resume ID: {resume.id}"
+        )
+
+        # -----------------------------
+        # Current Resume
+        # -----------------------------
+
+        st.subheader("📄 Resume Text")
 
         st.text_area(
             "Extracted Resume",
             resume_text,
-            height=300
+            height=250,
+            key="current_resume"
         )
 
-        st.subheader("Job Description Text")
+        st.subheader("💼 Job Description Text")
 
         st.text_area(
             "Extracted JD",
             jd_text,
-            height=300
+            height=250,
+            key="current_jd"
         )
 
-        st.subheader("🤖 AI Analysis")
+        # -----------------------------
+        # Current AI Analysis
+        # -----------------------------
+
+        st.subheader("🤖 Current AI Analysis")
 
         st.metric(
             "Match Percentage",
@@ -169,3 +154,69 @@ if analyze_button:
 
         for item in analysis["recommendations"]:
             st.write(f"• {item}")
+
+        # -----------------------------
+        # Stored Resume List
+        # -----------------------------
+
+        st.divider()
+
+        all_resumes = get_all_resumes()
+
+        st.subheader("📋 Stored Resumes")
+
+        resume_data = []
+
+        for r in all_resumes:
+            resume_data.append(
+                {
+                    "ID": r.id,
+                    "Resume Path": r.resume_path,
+                    "Uploaded At": r.created_at,
+                    "Match %": r.match_percentage
+                }
+            )
+
+        df = pd.DataFrame(resume_data)
+
+        st.dataframe(
+            df,
+            use_container_width=True,
+            hide_index=True
+        )
+
+        # -----------------------------
+        # Previous Analyses
+        # -----------------------------
+
+        if len(all_resumes) > 1:
+
+            st.divider()
+
+            st.subheader("📚 Previous AI Analyses")
+
+            for r in reversed(all_resumes[:-1]):
+
+                st.divider()
+
+                st.subheader(f"Resume #{r.id}")
+
+                st.metric(
+                    "Match Percentage",
+                    f"{r.match_percentage}%"
+                )
+
+                st.subheader("✅ Strengths")
+
+                for strength in r.strengths.split("\n"):
+                    st.write(f"• {strength}")
+
+                st.subheader("❌ Missing Skills")
+
+                for skill in r.missing_skills.split("\n"):
+                    st.write(f"• {skill}")
+
+                st.subheader("💡 Recommendations")
+
+                for recommendation in r.recommendations.split("\n"):
+                    st.write(f"• {recommendation}")
