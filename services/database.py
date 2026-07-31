@@ -60,3 +60,14 @@ def save_resume(
     finally:
         session.close()
 
+def get_all_resumes():
+    from models.schemas import Resume
+
+    session = SessionLocal()
+
+    try:
+        resumes = session.query(Resume).all()
+        return resumes
+
+    finally:
+        session.close()

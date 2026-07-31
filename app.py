@@ -2,7 +2,7 @@ import streamlit as st
 from services.pdf_reader import (save_uploaded_file, 
                                  extract_text_from_pdf, 
                                  clean_text)
-from services.database import save_resume
+from services.database import (save_resume, get_all_resumes)
 
 st.set_page_config(
     page_title="AI Resume Screening Agent",
@@ -66,6 +66,19 @@ if analyze_button:
                 )
 
         st.success(f"Files uploaded and saved successfully! Resume ID: {resume.id}")
+
+        all_resumes = get_all_resumes()
+
+        st.subheader("Stored Resumes")
+
+        for resume in all_resumes:
+            st.write(
+                f"""
+                ID: {resume.id}
+                | Resume: {resume.resume_path}
+                | Uploaded: {resume.created_at}
+                """
+            )
         
         st.subheader("Resume Text")
 
