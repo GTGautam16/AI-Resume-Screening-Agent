@@ -48,9 +48,14 @@ if analyze_button:
         resume_path = save_uploaded_file(resume_file)
         jd_path = save_uploaded_file(jd_file)
 
-        resume_text = clean_text(extract_text_from_pdf(resume_path))
+        try:
+            resume_text = clean_text(extract_text_from_pdf(resume_path))
 
-        jd_text = clean_text(extract_text_from_pdf(jd_path))
+            jd_text = clean_text(extract_text_from_pdf(jd_path))
+
+        except Exception as e:
+            st.error(str(e))
+            st.stop()
 
         st.success("Files uploaded successfully!")
 
