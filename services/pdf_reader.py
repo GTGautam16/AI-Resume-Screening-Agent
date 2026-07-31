@@ -1,21 +1,14 @@
 from pathlib import Path
-
+from pypdf import PdfReader
 
 UPLOAD_FOLDER = Path("uploads")
 
 
 def save_uploaded_file(uploaded_file):
     """
-    Save an uploaded PDF into the uploads folder.
-
-    Parameters:
-        uploaded_file: Streamlit UploadedFile object
-
-    Returns:
-        Path of the saved file
+    Save uploaded PDF to uploads folder.
     """
 
-    # Create uploads folder if it doesn't exist
     UPLOAD_FOLDER.mkdir(exist_ok=True)
 
     file_path = UPLOAD_FOLDER / uploaded_file.name
@@ -24,3 +17,20 @@ def save_uploaded_file(uploaded_file):
         f.write(uploaded_file.getbuffer())
 
     return file_path
+
+def extract_text_from_pdf(pdf_path):
+    """
+    Extract text from a PDF file.
+    """
+
+    reader = PdfReader(pdf_path)
+
+    text = ""
+
+    for page in reader.pages:
+        page_text = page.extract_text()
+
+        if page_text:
+            text += page_text + "\n"
+
+    return text
