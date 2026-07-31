@@ -7,5 +7,31 @@ st.set_page_config(
 )
 
 st.title("🤖 AI Resume Screening Agent")
+st.write("Upload a Resume and a Job Description to begin AI-powered analysis.")
 
-st.success("✅ Streamlit is working successfully!")
+st.divider()
+
+col1, col2 = st.columns(2)
+
+with col1:
+    st.subheader("📄 Resume")
+    resume_file = st.file_uploader(
+        "Upload Resume (PDF)",
+        type=["pdf"],
+        key="resume"
+    )
+
+with col2:
+    st.subheader("💼 Job Description")
+    jd_file = st.file_uploader(
+        "Upload Job Description (PDF)",
+        type=["pdf"],
+        key="jd"
+    )
+
+st.divider()
+
+analyze_button = st.button(
+    "🚀 Analyze Resume",
+    use_container_width=True
+)
