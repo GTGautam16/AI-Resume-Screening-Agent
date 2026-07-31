@@ -1,5 +1,6 @@
 from pathlib import Path
 from pypdf import PdfReader
+import re
 
 UPLOAD_FOLDER = Path("uploads")
 
@@ -32,5 +33,21 @@ def extract_text_from_pdf(pdf_path):
 
         if page_text:
             text += page_text + "\n"
+
+    return text
+
+def clean_text(text):
+    """
+    Clean extracted PDF text.
+    """
+
+    # Replace multiple spaces/tabs with a single space
+    text = re.sub(r"[ \t]+", " ", text)
+
+    # Replace 3 or more newlines with 2
+    text = re.sub(r"\n{3,}", "\n\n", text)
+
+    # Remove leading/trailing whitespace
+    text = text.strip()
 
     return text

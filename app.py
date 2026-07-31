@@ -1,5 +1,7 @@
 import streamlit as st
-from services.pdf_reader import (save_uploaded_file, extract_text_from_pdf)
+from services.pdf_reader import (save_uploaded_file, 
+                                 extract_text_from_pdf, 
+                                 clean_text)
 
 st.set_page_config(
     page_title="AI Resume Screening Agent",
@@ -46,8 +48,9 @@ if analyze_button:
         resume_path = save_uploaded_file(resume_file)
         jd_path = save_uploaded_file(jd_file)
 
-        resume_text = extract_text_from_pdf(resume_path)
-        jd_text = extract_text_from_pdf(jd_path)
+        resume_text = clean_text(extract_text_from_pdf(resume_path))
+
+        jd_text = clean_text(extract_text_from_pdf(jd_path))
 
         st.success("Files uploaded successfully!")
 
