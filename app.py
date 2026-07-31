@@ -1,4 +1,6 @@
 import streamlit as st
+import pandas as pd
+
 from services.pdf_reader import (save_uploaded_file, 
                                  extract_text_from_pdf, 
                                  clean_text)
@@ -71,14 +73,24 @@ if analyze_button:
 
         st.subheader("Stored Resumes")
 
+        resume_data = []
+
         for resume in all_resumes:
-            st.write(
-                f"""
-                ID: {resume.id}
-                | Resume: {resume.resume_path}
-                | Uploaded: {resume.created_at}
-                """
+            resume_data.append(
+                {
+                    "ID": resume.id,
+                    "Resume Path": resume.resume_path,
+                    "Uploaded At": resume.created_at
+                }
             )
+
+        df = pd.DataFrame(resume_data)
+
+        st.dataframe(
+            df,
+            use_container_width=True,
+            hide_index=True
+        )
         
         st.subheader("Resume Text")
 
