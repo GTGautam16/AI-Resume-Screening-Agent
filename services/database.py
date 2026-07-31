@@ -31,3 +31,32 @@ SessionLocal = sessionmaker(
 )
 
 Base = declarative_base()
+
+def save_resume(
+    resume_path,
+    jd_path,
+    resume_text,
+    jd_text
+):
+    from models.schemas import Resume
+
+    session = SessionLocal()
+
+    try:
+        resume = Resume(
+            resume_path=str(resume_path),
+            jd_path=str(jd_path),
+            resume_text=resume_text,
+            jd_text=jd_text
+        )
+
+        session.add(resume)
+        session.commit()
+
+        session.refresh(resume)
+
+        return resume
+
+    finally:
+        session.close()
+
