@@ -97,7 +97,7 @@ if analyze_button:
         if existing_resume:
             st.warning("This Resume and Job Description have already been analyzed.")
             st.stop()
-            
+
         resume = save_resume(
             resume_path,
             jd_path,
@@ -106,7 +106,8 @@ if analyze_button:
             analysis["match_percentage"],
             "\n".join(analysis["strengths"]),
             "\n".join(analysis["missing_skills"]),
-            "\n".join(analysis["recommendations"])
+            "\n".join(analysis["recommendations"]),
+             "\n".join(analysis["recommendations"])
         )
 
         st.success(

@@ -41,7 +41,8 @@ def save_resume(
     match_percentage,
     strengths,
     missing_skills,
-    recommendations
+    recommendations,
+    analysis_json
 ):
     from models.schemas import Resume
 
@@ -56,7 +57,8 @@ def save_resume(
             match_percentage=match_percentage,
             strengths=strengths,
             missing_skills=missing_skills,
-            recommendations=recommendations
+            recommendations=recommendations,
+            analysis_json=analysis_json
         )
 
         session.add(resume)

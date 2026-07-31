@@ -3,6 +3,7 @@ from sqlalchemy import Integer
 from sqlalchemy import String
 from sqlalchemy import Text
 from sqlalchemy import DateTime
+from sqlalchemy import JSON
 from sqlalchemy.sql import func
 from services.database import Base
 
@@ -26,6 +27,8 @@ class Resume(Base):
     missing_skills = Column(Text)
 
     recommendations = Column(Text)
+
+    analysis_json = Column(JSON, nullable=False)
 
     created_at = Column(
         DateTime(timezone=True),
