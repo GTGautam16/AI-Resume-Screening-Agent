@@ -19,6 +19,14 @@ class Resume(Base):
 
     jd_text = Column(Text, nullable=False)
 
+    match_percentage = Column(Integer)
+
+    strengths = Column(Text)
+
+    missing_skills = Column(Text)
+
+    recommendations = Column(Text)
+
     created_at = Column(
         DateTime(timezone=True),
         server_default=func.now()

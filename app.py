@@ -59,13 +59,6 @@ if analyze_button:
             st.error(str(e))
             st.stop()
 
-        resume = save_resume(
-                resume_path,
-                jd_path,
-                resume_text,
-                jd_text
-                )
-
         from services.llm import ask_llm
 
         prompt = f"""
@@ -98,6 +91,21 @@ if analyze_button:
         analysis = ask_llm(prompt)
 
         analysis = json.loads(analysis)
+
+        resume = save_resume(
+                        resume_path,
+                        jd_path,
+                        resume_text,
+                        jd_text, 
+        
+                        analysis["match_percentage"],
+        
+                        "\n".join(analysis["strengths"]),
+        
+                        "\n".join(analysis["missing_skills"]),
+        
+                        "\n".join(analysis["recommendations"])
+                    )
 
         st.success(f"Files uploaded and saved successfully! Resume ID: {resume.id}")
 

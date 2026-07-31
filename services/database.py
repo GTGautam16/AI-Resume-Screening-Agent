@@ -36,7 +36,11 @@ def save_resume(
     resume_path,
     jd_path,
     resume_text,
-    jd_text
+    jd_text,
+    match_percentage,
+    strengths,
+    missing_skills,
+    recommendations
 ):
     from models.schemas import Resume
 
@@ -47,7 +51,11 @@ def save_resume(
             resume_path=str(resume_path),
             jd_path=str(jd_path),
             resume_text=resume_text,
-            jd_text=jd_text
+            jd_text=jd_text,
+            match_percentage=match_percentage,
+            strengths=strengths,
+            missing_skills=missing_skills,
+            recommendations=recommendations
         )
 
         session.add(resume)
