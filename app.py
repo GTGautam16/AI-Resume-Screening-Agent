@@ -107,7 +107,7 @@ if analyze_button:
             "\n".join(analysis["strengths"]),
             "\n".join(analysis["missing_skills"]),
             "\n".join(analysis["recommendations"]),
-             "\n".join(analysis["recommendations"])
+            analysis
         )
 
         st.success(
@@ -202,28 +202,25 @@ if analyze_button:
 
             st.subheader("📚 Previous AI Analyses")
 
-            for r in reversed(all_resumes[:-1]):
+            for resume in reversed(all_resumes):
 
                 st.divider()
 
-                st.subheader(f"Resume #{r.id}")
+                st.subheader(f"Resume #{resume.id}")
 
-                st.metric(
-                    "Match Percentage",
-                    f"{r.match_percentage}%"
-                )
+                st.metric( "Match Percentage", f"{resume.analysis_json['match_percentage']}%" )
 
                 st.subheader("✅ Strengths")
 
-                for strength in r.strengths.split("\n"):
+                for strength in resume.analysis_json["strengths"]:
                     st.write(f"• {strength}")
 
                 st.subheader("❌ Missing Skills")
 
-                for skill in r.missing_skills.split("\n"):
+                for skill in resume.analysis_json["missing_skills"]:
                     st.write(f"• {skill}")
 
                 st.subheader("💡 Recommendations")
 
-                for recommendation in r.recommendations.split("\n"):
+                for recommendation in resume.analysis_json["recommendations"]:
                     st.write(f"• {recommendation}")
