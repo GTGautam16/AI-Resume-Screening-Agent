@@ -1,17 +1,19 @@
 from services.llm import ask_llm
 
 
-def generate_learning_roadmap(parsed_resume, jd_text):
-
+def generate_learning_roadmap(parsed_resume, analysis, jd_text):
     prompt = f"""
         You are an AI Career Coach.
 
-        Resume:
+        Parsed Resume:
         {parsed_resume}
+
+        Resume Analysis:
+        {analysis}
 
         Job Description:
         {jd_text}
-
+        
         Create a personalized roadmap.
 
         Include:

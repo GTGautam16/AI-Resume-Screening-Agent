@@ -19,9 +19,10 @@ def run_resume_pipeline(resume_text, jd_text):
     )
 
     learning_roadmap = generate_learning_roadmap(
-        parsed_resume,
-        jd_text
-    )
+    parsed_resume,
+    analysis,
+    jd_text
+)
 
     return {
         "parsed_resume": parsed_resume,
