@@ -131,33 +131,7 @@ if analyze_button:
             resume_text
         )
 
-        st.success(f"Total Embeddings Stored: {get_embedding_count()}")
-        
-        st.success(
-            f"Files uploaded and saved successfully! Resume ID: {resume.id}"
-        )
-
-        # -----------------------------
-        # Current Resume
-        # -----------------------------
-
-        st.subheader("📄 Resume Text")
-
-        st.text_area(
-            "Extracted Resume",
-            resume_text,
-            height=250,
-            key="current_resume"
-        )
-
-        st.subheader("💼 Job Description Text")
-
-        st.text_area(
-            "Extracted JD",
-            jd_text,
-            height=250,
-            key="current_jd"
-        )
+        st.success("✅ Resume analyzed successfully!")
 
         # -----------------------------
         # Current AI Analysis
@@ -165,10 +139,7 @@ if analyze_button:
 
         st.subheader("🤖 Current AI Analysis")
 
-        st.metric(
-            "Match Percentage",
-            f"{analysis['match_percentage']}%"
-        )
+        st.metric( "Match Percentage", f"{analysis['match_percentage']}%" )
 
         st.subheader("✅ Strengths")
 
@@ -194,7 +165,7 @@ if analyze_button:
         st.subheader("🎤 AI Interview Questions")
 
         st.write(interview_questions)
-        
+
         # -----------------------------
         # Personalized Learning Roadmap
         # -----------------------------
@@ -205,65 +176,98 @@ if analyze_button:
 
         st.write(learning_roadmap)
 
-        # -----------------------------
-        # Stored Resume List
-        # -----------------------------
+        # =====================================================
+        # Advanced Details
+        # =====================================================
 
-        st.divider()
+        with st.expander("⚙️ Advanced Details"):
 
-        all_resumes = get_all_resumes()
+            # -----------------------------
+            # Resume Text
+            # -----------------------------
 
-        st.subheader("📋 Stored Resumes")
+            st.subheader("📄 Resume Text")
 
-        resume_data = []
-
-        for r in all_resumes:
-            resume_data.append(
-                {
-                    "ID": r.id,
-                    "Resume Path": r.resume_path,
-                    "Uploaded At": r.created_at,
-                    "Match %": r.match_percentage
-                }
+            st.text_area(
+                "Extracted Resume",
+                resume_text,
+                height=250,
+                key="current_resume"
             )
 
-        df = pd.DataFrame(resume_data)
+            st.subheader("💼 Job Description Text")
 
-        st.dataframe(
-            df,
-            use_container_width=True,
-            hide_index=True
-        )
-
-        # -----------------------------
-        # Previous Analyses
-        # -----------------------------
-
-        if len(all_resumes) > 1:
+            st.text_area(
+                "Extracted JD",
+                jd_text,
+                height=250,
+                key="current_jd"
+            )
 
             st.divider()
 
-            st.subheader("📚 Previous AI Analyses")
+            st.write(f"**Total Embeddings Stored:** {get_embedding_count()}")
 
-            for resume in reversed(all_resumes):
+            # -----------------------------
+            # Stored Resume List
+            # -----------------------------
+
+            all_resumes = get_all_resumes()
+
+            st.subheader("📋 Stored Resumes")
+
+            resume_data = []
+
+            for resume in all_resumes:
+                resume_data.append(
+                    {
+                        "ID": resume.id,
+                        "Resume Path": resume.resume_path,
+                        "Uploaded At": resume.created_at,
+                        "Match %": resume.match_percentage
+                    }
+                )
+
+            df = pd.DataFrame(resume_data)
+
+            st.dataframe(
+                df,
+                use_container_width=True,
+                hide_index=True
+            )
+
+            # -----------------------------
+            # Previous Analyses
+            # -----------------------------
+
+            if len(all_resumes) > 1:
 
                 st.divider()
 
-                st.subheader(f"Resume #{resume.id}")
+                st.subheader("📚 Previous AI Analyses")
 
-                st.metric( "Match Percentage", f"{resume.analysis_json['match_percentage']}%" )
+                for previous_resume in reversed(all_resumes):
 
-                st.subheader("✅ Strengths")
+                    st.divider()
 
-                for strength in resume.analysis_json["strengths"]:
-                    st.write(f"• {strength}")
+                    st.subheader(f"Resume #{previous_resume.id}")
 
-                st.subheader("❌ Missing Skills")
+                    st.metric(
+                        "Match Percentage",
+                        f"{previous_resume.analysis_json['match_percentage']}%"
+                    )
 
-                for skill in resume.analysis_json["missing_skills"]:
-                    st.write(f"• {skill}")
+                    st.subheader("✅ Strengths")
 
-                st.subheader("💡 Recommendations")
+                    for strength in previous_resume.analysis_json["strengths"]:
+                        st.write(f"• {strength}")
 
-                for recommendation in resume.analysis_json["recommendations"]:
-                    st.write(f"• {recommendation}")
+                    st.subheader("❌ Missing Skills")
+
+                    for skill in previous_resume.analysis_json["missing_skills"]:
+                        st.write(f"• {skill}")
+
+                    st.subheader("💡 Recommendations")
+
+                    for recommendation in previous_resume.analysis_json["recommendations"]:
+                        st.write(f"• {recommendation}")
