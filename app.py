@@ -4,7 +4,7 @@ import json
 
 from services.pdf_reader import (save_uploaded_file, extract_text_from_pdf, clean_text)
 from services.database import (save_resume, get_all_resumes, resume_exists)
-from services.vector_store import (store_resume_embedding, get_embedding_count)
+from services.vector_store import (store_resume_embedding, get_embedding_count, search_similar_resumes)
 
 st.set_page_config(
     page_title="AI Resume Screening Agent",
@@ -16,6 +16,7 @@ st.title("🤖 AI Resume Screening Agent")
 st.write("Upload a Resume and a Job Description to begin AI-powered analysis.")
 
 st.divider()
+
 
 col1, col2 = st.columns(2)
 
@@ -41,6 +42,14 @@ analyze_button = st.button(
     "🚀 Analyze Resume",
     use_container_width=True
 )
+
+st.subheader("🔍 Semantic Resume Search")
+search_query = st.text_input("Search resumes using natural language")
+search_button = st.button("Search")
+
+if search_button and search_query:
+    results = search_similar_resumes(search_query)
+    st.write(results)
 
 if analyze_button:
 
