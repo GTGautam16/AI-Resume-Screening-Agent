@@ -6,11 +6,8 @@ from services.pdf_reader import (save_uploaded_file, extract_text_from_pdf, clea
 from services.database import (save_resume, get_all_resumes, resume_exists)
 from services.vector_store import (store_resume_embedding, get_embedding_count, search_similar_resumes)
 from services.rag import answer_with_rag
-from agents.roadmap import generate_learning_roadmap
 
-from agents.parser import parse_resume
-from agents.scorer import score_resume
-from agents.interviewer import generate_interview_questions
+from agents.planner import run_resume_pipeline
 
 
 st.set_page_config(
@@ -104,10 +101,12 @@ if analyze_button:
                 """
 
         with st.spinner("🤖 AI is analyzing the resume..."):
-            parsed_resume = parse_resume(resume_text)
-            analysis = score_resume(parsed_resume, jd_text)
-            interview_questions = generate_interview_questions(parsed_resume, jd_text)
-            learning_roadmap = generate_learning_roadmap(parsed_resume,jd_text)
+            result = run_resume_pipeline(resume_text, jd_text)
+
+            parsed_resume = result["parsed_resume"]
+            analysis = result["analysis"]
+            interview_questions = result["interview_questions"]
+            learning_roadmap = result["learning_roadmap"]
 
         existing_resume = resume_exists(resume_path,jd_path)
 
