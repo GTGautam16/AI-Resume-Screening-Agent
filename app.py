@@ -49,7 +49,27 @@ search_button = st.button("Search")
 
 if search_button and search_query:
     results = search_similar_resumes(search_query)
-    st.write(results)
+
+    if len(results["ids"][0]) == 0:
+        st.warning("No matching resumes found.")
+
+    else:
+        st.success(f"Found {len(results['ids'][0])} matching resumes")
+
+        for i in range(len(results["ids"][0])):
+
+            st.divider()
+
+            st.subheader(f"Resume ID: {results['ids'][0][i]}")
+
+            st.write(f"Similarity Score: {results['distances'][0][i]:.4f}")
+
+            st.text_area(
+                "Resume Preview",
+                results["documents"][0][i][:1000],
+                height=200,
+                key=f"search_{i}"
+            )
 
 if analyze_button:
 

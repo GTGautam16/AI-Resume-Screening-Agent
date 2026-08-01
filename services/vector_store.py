@@ -24,7 +24,12 @@ def search_similar_resumes(query_text, n_results=3):
 
     results = collection.query(
         query_embeddings=[query_embedding],
-        n_results=n_results
+        n_results=n_results,
+        include=[
+            "documents",
+            "distances",
+            "metadatas"
+        ]
     )
 
     return results
