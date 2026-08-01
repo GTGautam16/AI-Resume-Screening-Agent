@@ -1,7 +1,10 @@
+import streamlit as st
+
 from services.llm import ask_llm
 
 
 def generate_learning_roadmap(parsed_resume, analysis, jd_text):
+
     prompt = f"""
         You are an AI Career Coach.
 
@@ -13,7 +16,7 @@ def generate_learning_roadmap(parsed_resume, analysis, jd_text):
 
         Job Description:
         {jd_text}
-        
+
         Create a personalized roadmap.
 
         Include:
@@ -25,6 +28,11 @@ def generate_learning_roadmap(parsed_resume, analysis, jd_text):
         5. Estimated timeline
 
         Keep it structured.
-        """
+    """
 
-    return ask_llm(prompt)
+    response = ask_llm(prompt)
+
+    if not response:
+        st.stop()
+
+    return response

@@ -111,7 +111,7 @@ if analyze_button:
         existing_resume = resume_exists(resume_path,jd_path)
 
         if existing_resume:
-            st.warning("This Resume and Job Description have already been analyzed.")
+            st.info("ℹ️ This Resume and Job Description have already been analyzed.")
             st.stop()
 
         resume = save_resume(

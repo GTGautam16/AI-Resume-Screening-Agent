@@ -1,3 +1,5 @@
+import streamlit as st
+
 from services.vector_store import search_similar_resumes
 from services.llm import ask_llm
 
@@ -14,7 +16,6 @@ def answer_with_rag(query):
     if results["documents"]:
 
         for document in results["documents"][0]:
-
             context += document
             context += "\n\n"
 
@@ -49,6 +50,11 @@ def answer_with_rag(query):
 
         Recruiter Question:
         {query}
-        """
-    
-    return ask_llm(prompt)
+    """
+
+    answer = ask_llm(prompt)
+
+    if not answer:
+        st.stop()
+
+    return answer

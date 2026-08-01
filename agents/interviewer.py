@@ -1,3 +1,5 @@
+import streamlit as st
+
 from services.llm import ask_llm
 
 
@@ -17,6 +19,11 @@ def generate_interview_questions(parsed_resume, jd_text):
 
         Job Description:
         {jd_text}
-        """
+    """
 
-    return ask_llm(prompt)
+    response = ask_llm(prompt)
+
+    if not response:
+        st.stop()
+
+    return response

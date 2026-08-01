@@ -1,5 +1,6 @@
 import json
 import streamlit as st
+
 from services.llm import ask_llm
 
 
@@ -23,14 +24,21 @@ def score_resume(parsed_resume, jd_text):
             "strengths": [],
             "missing_skills": [],
             "recommendations": []
-
-            }}
-        """
+        }}
+    """
 
     response = ask_llm(prompt)
+
+    if not response:
+        st.stop()
 
     st.write(response)
 
     response = response.replace("```json", "").replace("```", "").strip()
 
-    return json.loads(response)
+    try:
+        return json.loads(response)
+
+    except json.JSONDecodeError:
+        st.error("❌ AI returned an invalid JSON response. Please try again.")
+        st.stop()
