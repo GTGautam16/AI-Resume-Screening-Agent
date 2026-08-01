@@ -6,6 +6,7 @@ from services.pdf_reader import (save_uploaded_file, extract_text_from_pdf, clea
 from services.database import (save_resume, get_all_resumes, resume_exists)
 from services.vector_store import (store_resume_embedding, get_embedding_count, search_similar_resumes)
 from services.rag import answer_with_rag
+from agents.roadmap import generate_learning_roadmap
 
 from agents.parser import parse_resume
 from agents.scorer import score_resume
@@ -22,7 +23,6 @@ st.title("🤖 AI Resume Screening Agent")
 st.write("Upload a Resume and a Job Description to begin AI-powered analysis.")
 
 st.divider()
-
 
 col1, col2 = st.columns(2)
 
@@ -44,10 +44,7 @@ with col2:
 
 st.divider()
 
-analyze_button = st.button(
-    "🚀 Analyze Resume",
-    use_container_width=True
-)
+analyze_button = st.button( "🚀 Analyze Resume", use_container_width=True )
 
 st.subheader("🔍 Semantic Resume Search")
 search_query = st.text_input("Search resumes using natural language")
@@ -110,7 +107,7 @@ if analyze_button:
             parsed_resume = parse_resume(resume_text)
             analysis = score_resume(parsed_resume, jd_text)
             interview_questions = generate_interview_questions(parsed_resume, jd_text)
-
+            learning_roadmap = generate_learning_roadmap(parsed_resume,jd_text)
 
         existing_resume = resume_exists(resume_path,jd_path)
 
@@ -199,6 +196,16 @@ if analyze_button:
 
         st.write(interview_questions)
         
+        # -----------------------------
+        # Personalized Learning Roadmap
+        # -----------------------------
+
+        st.divider()
+
+        st.subheader("🛣️ Personalized Learning Roadmap")
+
+        st.write(learning_roadmap)
+
         # -----------------------------
         # Stored Resume List
         # -----------------------------
