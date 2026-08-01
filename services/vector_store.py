@@ -14,3 +14,6 @@ def store_resume_embedding(resume_id,resume_text ):
         embeddings=[embedding],
         documents=[resume_text]
     )
+
+def get_embedding_count():
+    return collection.count()

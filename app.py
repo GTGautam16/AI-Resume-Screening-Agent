@@ -4,7 +4,7 @@ import json
 
 from services.pdf_reader import (save_uploaded_file, extract_text_from_pdf, clean_text)
 from services.database import (save_resume, get_all_resumes, resume_exists)
-from services.vector_store import store_resume_embedding
+from services.vector_store import (store_resume_embedding, get_embedding_count)
 
 st.set_page_config(
     page_title="AI Resume Screening Agent",
@@ -115,6 +115,8 @@ if analyze_button:
             resume.id,
             resume_text
         )
+
+        st.success(f"Total Embeddings Stored: {get_embedding_count()}")
         
         st.success(
             f"Files uploaded and saved successfully! Resume ID: {resume.id}"
