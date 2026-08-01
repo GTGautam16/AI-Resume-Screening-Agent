@@ -7,6 +7,9 @@ from services.database import (save_resume, get_all_resumes, resume_exists)
 from services.vector_store import (store_resume_embedding, get_embedding_count, search_similar_resumes)
 from services.rag import answer_with_rag
 
+from agents.parser import parse_resume
+from agents.scorer import score_resume
+
 st.set_page_config(
     page_title="AI Resume Screening Agent",
     page_icon="🤖",
@@ -66,7 +69,6 @@ if analyze_button:
 
         try:
             resume_text = clean_text(extract_text_from_pdf(resume_path))
-
             jd_text = clean_text(extract_text_from_pdf(jd_path))
 
         except Exception as e:
@@ -103,8 +105,8 @@ if analyze_button:
                 """
 
         with st.spinner("🤖 AI is analyzing the resume..."):
-            analysis = ask_llm(prompt)
-            analysis = json.loads(analysis)
+            parsed_resume = parse_resume(resume_text)
+            analysis = score_resume(parsed_resume, jd_text)
 
         existing_resume = resume_exists(resume_path,jd_path)
 
