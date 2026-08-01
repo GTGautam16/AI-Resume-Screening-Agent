@@ -9,6 +9,8 @@ from services.rag import answer_with_rag
 
 from agents.parser import parse_resume
 from agents.scorer import score_resume
+from agents.interviewer import generate_interview_questions
+
 
 st.set_page_config(
     page_title="AI Resume Screening Agent",
@@ -107,6 +109,8 @@ if analyze_button:
         with st.spinner("🤖 AI is analyzing the resume..."):
             parsed_resume = parse_resume(resume_text)
             analysis = score_resume(parsed_resume, jd_text)
+            interview_questions = generate_interview_questions(parsed_resume, jd_text)
+
 
         existing_resume = resume_exists(resume_path,jd_path)
 
@@ -185,6 +189,16 @@ if analyze_button:
         for item in analysis["recommendations"]:
             st.write(f"• {item}")
 
+        # -----------------------------
+        # AI Interview Questions
+        # -----------------------------
+
+        st.divider()
+
+        st.subheader("🎤 AI Interview Questions")
+
+        st.write(interview_questions)
+        
         # -----------------------------
         # Stored Resume List
         # -----------------------------
