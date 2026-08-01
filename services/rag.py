@@ -19,19 +19,20 @@ def answer_with_rag(query):
             context += "\n\n"
 
     prompt = f"""
-    You are an expert AI Resume Assistant.
+        You are an experienced Technical Recruiter.
 
-    Use ONLY the following resume context to answer.
+        Use ONLY the resume information provided below.
 
-    Resume Context:
+        If the answer is not present in the resumes, reply:
+        "I could not find that information in the stored resumes."
 
-    {context}
+        Resume Context:
+        {context}
 
-    Question:
+        Recruiter Question:
+        {query}
 
-    {query}
-
-    Answer clearly and professionally.
-    """
+        Answer professionally using bullet points whenever appropriate.
+        """
     
     return ask_llm(prompt)
