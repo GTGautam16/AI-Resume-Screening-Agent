@@ -5,6 +5,7 @@ import json
 from services.pdf_reader import (save_uploaded_file, extract_text_from_pdf, clean_text)
 from services.database import (save_resume, get_all_resumes, resume_exists)
 from services.vector_store import (store_resume_embedding, get_embedding_count, search_similar_resumes)
+from services.rag import answer_with_rag
 
 st.set_page_config(
     page_title="AI Resume Screening Agent",
@@ -48,28 +49,11 @@ search_query = st.text_input("Search resumes using natural language")
 search_button = st.button("Search")
 
 if search_button and search_query:
-    results = search_similar_resumes(search_query)
+    with st.spinner("Searching resumes..."):
+        answer = answer_with_rag(search_query)
 
-    if len(results["ids"][0]) == 0:
-        st.warning("No matching resumes found.")
-
-    else:
-        st.success(f"Found {len(results['ids'][0])} matching resumes")
-
-        for i in range(len(results["ids"][0])):
-
-            st.divider()
-
-            st.subheader(f"Resume ID: {results['ids'][0][i]}")
-
-            st.write(f"Similarity Score: {results['distances'][0][i]:.4f}")
-
-            st.text_area(
-                "Resume Preview",
-                results["documents"][0][i][:1000],
-                height=200,
-                key=f"search_{i}"
-            )
+    st.subheader("🤖 AI Answer")
+    st.write(answer)
 
 if analyze_button:
 

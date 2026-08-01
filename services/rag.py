@@ -19,19 +19,19 @@ def answer_with_rag(query):
             context += "\n\n"
 
     prompt = f"""
-You are an expert AI Resume Assistant.
+    You are an expert AI Resume Assistant.
 
-Use ONLY the following resume context to answer.
+    Use ONLY the following resume context to answer.
 
-Resume Context:
+    Resume Context:
 
-{context}
+    {context}
 
-Question:
+    Question:
 
-{query}
+    {query}
 
-Answer clearly and professionally.
-"""
-
+    Answer clearly and professionally.
+    """
+    
     return ask_llm(prompt)
