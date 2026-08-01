@@ -21,18 +21,34 @@ def answer_with_rag(query):
     prompt = f"""
         You are an experienced Technical Recruiter.
 
-        Use ONLY the resume information provided below.
+        Use ONLY the resume context below.
 
-        If the answer is not present in the resumes, reply:
-        "I could not find that information in the stored resumes."
+        Compare all retrieved candidates.
+
+        Return your answer in this format:
+
+        🏆 Rank 1
+        - Candidate ID
+        - Why selected
+        - Strengths
+
+        🥈 Rank 2
+        - Candidate ID
+        - Why selected
+        - Strengths
+
+        🥉 Rank 3
+        - Candidate ID
+        - Why selected
+        - Strengths
+
+        If only one candidate is retrieved, evaluate that candidate only.
 
         Resume Context:
         {context}
 
         Recruiter Question:
         {query}
-
-        Answer professionally using bullet points whenever appropriate.
         """
     
     return ask_llm(prompt)
