@@ -1,7 +1,7 @@
 import os
+import streamlit as st
 
 from dotenv import load_dotenv
-
 from groq import Groq
 
 load_dotenv()
@@ -13,16 +13,24 @@ client = Groq(api_key=GROQ_API_KEY)
 
 def ask_llm(prompt):
 
-    response = client.chat.completions.create(
+    try:
 
-        model="llama-3.3-70b-versatile",
+        response = client.chat.completions.create(
 
-        messages=[
-            {
-                "role": "user",
-                "content": prompt
-            }
-        ]
-    )
+            model="llama-3.3-70b-versatile",
 
-    return response.choices[0].message.content
+            messages=[
+                {
+                    "role": "user",
+                    "content": prompt
+                }
+            ]
+        )
+
+        return response.choices[0].message.content
+
+    except Exception as e:
+
+        st.error(f"❌ LLM Error: {e}")
+
+        return None
