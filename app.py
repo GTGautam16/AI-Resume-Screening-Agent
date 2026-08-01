@@ -88,9 +88,9 @@ if analyze_button:
                 Return JSON only.
                 """
 
-        analysis = ask_llm(prompt)
-
-        analysis = json.loads(analysis)
+        with st.spinner("🤖 AI is analyzing the resume..."):
+            analysis = ask_llm(prompt)
+            analysis = json.loads(analysis)
 
         existing_resume = resume_exists(resume_path,jd_path)
 
