@@ -30,28 +30,7 @@ The project demonstrates modern AI Engineering concepts including Agentic AI, La
 
 # 🏗️ Architecture
 
-```
-Resume PDF
-      │
-      ▼
-PDF Parser
-      │
-      ▼
-LangGraph Workflow
- ├── Resume Parser
- ├── Resume Scorer
- ├── Interview Generator
- └── Learning Roadmap
-      │
-      ▼
-Groq LLM
-      │
-      ▼
-PostgreSQL + ChromaDB
-      │
-      ▼
-FastAPI & Streamlit
-```
+![Architecture](docs/architecture.png)
 
 ---
 
