@@ -104,3 +104,7 @@ def resume_exists(resume_path,jd_path):
 
     finally:
         session.close()
+
+from models.schemas import Resume
+
+Base.metadata.create_all(bind=engine)
