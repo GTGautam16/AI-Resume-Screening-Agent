@@ -134,13 +134,23 @@ if analyze_button:
 
         st.success("✅ Resume analyzed successfully!")
 
-        # -----------------------------
-        # Current AI Analysis
-        # -----------------------------
+        tab1, tab2, tab3, tab4 = st.tabs(
+        [
+            "📊 Analysis",
+            "🎤 Interview",
+            "🛣️ Roadmap",
+            "⚙️ Advanced"
+        ]
+    )
 
-        st.subheader("🤖 Current AI Analysis")
+    with tab1:
 
-        st.metric( "Match Percentage", f"{analysis['match_percentage']}%" )
+        st.subheader("🤖 AI Analysis")
+
+        st.metric(
+            "Match Percentage",
+            f"{analysis['match_percentage']}%"
+        )
 
         st.subheader("✅ Strengths")
 
@@ -157,118 +167,106 @@ if analyze_button:
         for item in analysis["recommendations"]:
             st.write(f"• {item}")
 
-        # -----------------------------
-        # AI Interview Questions
-        # -----------------------------
-
-        st.divider()
+    with tab2:
 
         st.subheader("🎤 AI Interview Questions")
 
         st.write(interview_questions)
 
-        # -----------------------------
-        # Personalized Learning Roadmap
-        # -----------------------------
-
-        st.divider()
+    with tab3:
 
         st.subheader("🛣️ Personalized Learning Roadmap")
 
         st.write(learning_roadmap)
 
-        # =====================================================
-        # Advanced Details
-        # =====================================================
+    with tab4:
+        
+        # -----------------------------
+        # Resume Text
+        # -----------------------------
 
-        with st.expander("⚙️ Advanced Details"):
+        st.subheader("📄 Resume Text")
 
-            # -----------------------------
-            # Resume Text
-            # -----------------------------
+        st.text_area(
+            "Extracted Resume",
+            resume_text,
+            height=250,
+            key="current_resume"
+        )
 
-            st.subheader("📄 Resume Text")
+        st.subheader("💼 Job Description Text")
 
-            st.text_area(
-                "Extracted Resume",
-                resume_text,
-                height=250,
-                key="current_resume"
+        st.text_area(
+            "Extracted JD",
+            jd_text,
+            height=250,
+            key="current_jd"
+        )
+
+        st.divider()
+
+        st.write(f"**Total Embeddings Stored:** {get_embedding_count()}")
+
+        # -----------------------------
+        # Stored Resume List
+        # -----------------------------
+
+        all_resumes = get_all_resumes()
+
+        st.subheader("📋 Stored Resumes")
+
+        resume_data = []
+
+        for resume in all_resumes:
+            resume_data.append(
+                {
+                    "ID": resume.id,
+                    "Resume Path": resume.resume_path,
+                    "Uploaded At": resume.created_at,
+                    "Match %": resume.match_percentage
+                }
             )
 
-            st.subheader("💼 Job Description Text")
+        df = pd.DataFrame(resume_data)
 
-            st.text_area(
-                "Extracted JD",
-                jd_text,
-                height=250,
-                key="current_jd"
-            )
+        st.dataframe(
+            df,
+            use_container_width=True,
+            hide_index=True
+        )
+
+        # -----------------------------
+        # Previous Analyses
+        # -----------------------------
+
+        if len(all_resumes) > 1:
 
             st.divider()
 
-            st.write(f"**Total Embeddings Stored:** {get_embedding_count()}")
+            st.subheader("📚 Previous AI Analyses")
 
-            # -----------------------------
-            # Stored Resume List
-            # -----------------------------
-
-            all_resumes = get_all_resumes()
-
-            st.subheader("📋 Stored Resumes")
-
-            resume_data = []
-
-            for resume in all_resumes:
-                resume_data.append(
-                    {
-                        "ID": resume.id,
-                        "Resume Path": resume.resume_path,
-                        "Uploaded At": resume.created_at,
-                        "Match %": resume.match_percentage
-                    }
-                )
-
-            df = pd.DataFrame(resume_data)
-
-            st.dataframe(
-                df,
-                use_container_width=True,
-                hide_index=True
-            )
-
-            # -----------------------------
-            # Previous Analyses
-            # -----------------------------
-
-            if len(all_resumes) > 1:
+            for previous_resume in reversed(all_resumes):
 
                 st.divider()
 
-                st.subheader("📚 Previous AI Analyses")
+                st.subheader(f"Resume #{previous_resume.id}")
 
-                for previous_resume in reversed(all_resumes):
+                st.metric(
+                    "Match Percentage",
+                    f"{previous_resume.analysis_json['match_percentage']}%"
+                )
 
-                    st.divider()
+                st.subheader("✅ Strengths")
 
-                    st.subheader(f"Resume #{previous_resume.id}")
+                for strength in previous_resume.analysis_json["strengths"]:
+                    st.write(f"• {strength}")
 
-                    st.metric(
-                        "Match Percentage",
-                        f"{previous_resume.analysis_json['match_percentage']}%"
-                    )
+                st.subheader("❌ Missing Skills")
 
-                    st.subheader("✅ Strengths")
+                for skill in previous_resume.analysis_json["missing_skills"]:
+                    st.write(f"• {skill}")
 
-                    for strength in previous_resume.analysis_json["strengths"]:
-                        st.write(f"• {strength}")
+                st.subheader("💡 Recommendations")
 
-                    st.subheader("❌ Missing Skills")
-
-                    for skill in previous_resume.analysis_json["missing_skills"]:
-                        st.write(f"• {skill}")
-
-                    st.subheader("💡 Recommendations")
-
-                    for recommendation in previous_resume.analysis_json["recommendations"]:
-                        st.write(f"• {recommendation}")
+                for recommendation in previous_resume.analysis_json["recommendations"]:
+                    st.write(f"• {recommendation}")        

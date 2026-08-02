@@ -7,6 +7,7 @@ from groq import Groq
 load_dotenv()
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+print("Current Key:", GROQ_API_KEY[:15]) 
 
 client = Groq(api_key=GROQ_API_KEY)
 

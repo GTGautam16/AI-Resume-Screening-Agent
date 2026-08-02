@@ -7,34 +7,54 @@ from services.llm import ask_llm
 def score_resume(parsed_resume, jd_text):
 
     prompt = f"""
-        You are an AI Resume Scoring Agent.
+    You are an AI Resume Scoring Agent.
 
-        Compare this parsed resume with the Job Description.
+    Compare the parsed resume with the Job Description.
 
-        Parsed Resume:
-        {parsed_resume}
+    Return ONLY a valid JSON object.
 
-        Job Description:
-        {jd_text}
+    Do NOT explain anything.
+    Do NOT write markdown.
+    Do NOT add notes before or after the JSON.
 
-        Return ONLY valid JSON.
+    Parsed Resume:
+    {parsed_resume}
 
-        {{
-            "match_percentage": 0,
-            "strengths": [],
-            "missing_skills": [],
-            "recommendations": []
-        }}
+    Job Description:
+    {jd_text}
+
+    JSON format:
+
+    {{
+        "match_percentage": 0,
+        "strengths": [],
+        "missing_skills": [],
+        "recommendations": []
+    }}
     """
 
     response = ask_llm(prompt)
 
     if not response:
+        st.error("❌ No response received from the AI.")
         st.stop()
 
-    st.write(response)
+    # Remove markdown if present
+    response = (
+        response.replace("```json", "")
+        .replace("```", "")
+        .strip()
+    )
 
-    response = response.replace("```json", "").replace("```", "").strip()
+    # Extract only the JSON object
+    start = response.find("{")
+    end = response.rfind("}")
+
+    if start == -1 or end == -1:
+        st.error("❌ AI did not return a valid JSON response.")
+        st.stop()
+
+    response = response[start:end + 1]
 
     try:
         return json.loads(response)
