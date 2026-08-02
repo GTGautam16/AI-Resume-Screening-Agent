@@ -55,7 +55,11 @@ async def analyze_resume(
         jd_text
     )
 
-    return result
+    return {
+    "analysis": result.get("analysis"),
+    "interview_questions": result.get("interview_questions"),
+    "learning_roadmap": result.get("learning_roadmap")
+}
 
 @app.post("/search")
 async def search_resume(request: SearchRequest):

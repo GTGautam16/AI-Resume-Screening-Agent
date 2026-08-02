@@ -1,23 +1,8 @@
 import streamlit as st
 
-from services.pdf_reader import (
-    save_uploaded_file,
-    extract_text_from_pdf,
-    clean_text
-)
+import requests
 
-from services.database import (
-    save_resume,
-    resume_exists
-)
-
-from services.vector_store import (
-    store_resume_embedding
-)
-
-from services.rag import answer_with_rag
-
-from agents.planner import run_resume_pipeline
+from config import API_URL
 
 
 st.set_page_config(
@@ -75,7 +60,15 @@ search_button = st.button("Search")
 if search_button and search_query:
 
     with st.spinner("Searching resumes..."):
-        answer = answer_with_rag(search_query)
+
+        response = requests.post(
+            f"{API_URL}/search",
+            json={
+                "query": search_query
+            }
+        )
+
+        answer = response.json()["answer"]
 
     st.subheader("🤖 AI Answer")
     st.write(answer)
@@ -91,63 +84,33 @@ if analyze_button:
         st.error("Please upload both Resume and Job Description PDFs.")
         st.stop()
 
-    resume_path = save_uploaded_file(resume_file)
-    jd_path = save_uploaded_file(jd_file)
+    files = {
+    "resume": (
+        resume_file.name,
+        resume_file.getvalue(),
+        "application/pdf"
+    ),
+    "jd": (
+        jd_file.name,
+        jd_file.getvalue(),
+        "application/pdf"
+    )
+    }
 
-    try:
+    response = requests.post(
+        f"{API_URL}/analyze",
+        files=files
+    )
 
-        resume_text = clean_text(
-            extract_text_from_pdf(resume_path)
-        )
-
-        jd_text = clean_text(
-            extract_text_from_pdf(jd_path)
-        )
-
-    except Exception as e:
-
-        st.error(str(e))
+    if response.status_code != 200:
+        st.error(response.text)
         st.stop()
 
-    existing_resume = resume_exists(
-        resume_path,
-        jd_path
-    )
+    result = response.json()
 
-    if existing_resume:
-
-        st.info(
-            "ℹ️ This Resume and Job Description have already been analyzed."
-        )
-        st.stop()
-
-    with st.spinner("🤖 AI is analyzing the resume..."):
-
-        result = run_resume_pipeline(
-            resume_text,
-            jd_text
-        )
-
-        analysis = result["analysis"]
-        interview_questions = result["interview_questions"]
-        learning_roadmap = result["learning_roadmap"]
-
-    resume = save_resume(
-        resume_path,
-        jd_path,
-        resume_text,
-        jd_text,
-        analysis["match_percentage"],
-        "\n".join(analysis["strengths"]),
-        "\n".join(analysis["missing_skills"]),
-        "\n".join(analysis["recommendations"]),
-        analysis
-    )
-
-    store_resume_embedding(
-        resume.id,
-        resume_text
-    )
+    analysis = result["analysis"]
+    interview_questions = result["interview_questions"]
+    learning_roadmap = result["learning_roadmap"]
 
     st.success("✅ Resume analyzed successfully!")
 
