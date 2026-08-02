@@ -35,10 +35,6 @@ def score_resume(parsed_resume, jd_text):
 
     response = ask_llm(prompt)
 
-    if not response:
-        st.error("❌ No response received from the AI.")
-        st.stop()
-
     # Remove markdown if present
     response = (
         response.replace("```json", "")
