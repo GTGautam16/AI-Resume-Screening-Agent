@@ -6,6 +6,9 @@ from services.pdf_reader import (
 )
 from agents.planner import run_resume_pipeline
 
+from pydantic import BaseModel
+from services.rag import answer_with_rag
+
 from fastapi import FastAPI
 
 app = FastAPI(
@@ -14,6 +17,8 @@ app = FastAPI(
     version="1.0.0"
 )
 
+class SearchRequest(BaseModel):
+    query: str
 
 @app.get("/")
 def home():
@@ -51,3 +56,13 @@ async def analyze_resume(
     )
 
     return result
+
+@app.post("/search")
+async def search_resume(request: SearchRequest):
+
+    answer = answer_with_rag(request.query)
+
+    return {
+        "query": request.query,
+        "answer": answer
+    }
