@@ -1,10 +1,20 @@
 import streamlit as st
-import pandas as pd
-import json
 
-from services.pdf_reader import (save_uploaded_file, extract_text_from_pdf, clean_text)
-from services.database import (save_resume, get_all_resumes, resume_exists)
-from services.vector_store import (store_resume_embedding, get_embedding_count, search_similar_resumes)
+from services.pdf_reader import (
+    save_uploaded_file,
+    extract_text_from_pdf,
+    clean_text
+)
+
+from services.database import (
+    save_resume,
+    resume_exists
+)
+
+from services.vector_store import (
+    store_resume_embedding
+)
+
 from services.rag import answer_with_rag
 
 from agents.planner import run_resume_pipeline
@@ -20,6 +30,10 @@ st.title("🤖 AI Resume Screening Agent")
 st.write("Upload a Resume and a Job Description to begin AI-powered analysis.")
 
 st.divider()
+
+# -----------------------------
+# Upload Section
+# -----------------------------
 
 col1, col2 = st.columns(2)
 
@@ -41,107 +55,117 @@ with col2:
 
 st.divider()
 
-analyze_button = st.button( "🚀 Analyze Resume", use_container_width=True )
+analyze_button = st.button(
+    "🚀 Analyze Resume",
+    use_container_width=True
+)
+
+# -----------------------------
+# Semantic Search
+# -----------------------------
 
 st.subheader("🔍 Semantic Resume Search")
-search_query = st.text_input("Search resumes using natural language")
+
+search_query = st.text_input(
+    "Search resumes using natural language"
+)
+
 search_button = st.button("Search")
 
 if search_button and search_query:
+
     with st.spinner("Searching resumes..."):
         answer = answer_with_rag(search_query)
 
     st.subheader("🤖 AI Answer")
     st.write(answer)
 
+# -----------------------------
+# Resume Analysis
+# -----------------------------
+
 if analyze_button:
 
     if resume_file is None or jd_file is None:
+
         st.error("Please upload both Resume and Job Description PDFs.")
+        st.stop()
 
-    else:
-        resume_path = save_uploaded_file(resume_file)
-        jd_path = save_uploaded_file(jd_file)
+    resume_path = save_uploaded_file(resume_file)
+    jd_path = save_uploaded_file(jd_file)
 
-        try:
-            resume_text = clean_text(extract_text_from_pdf(resume_path))
-            jd_text = clean_text(extract_text_from_pdf(jd_path))
+    try:
 
-        except Exception as e:
-            st.error(str(e))
-            st.stop()
+        resume_text = clean_text(
+            extract_text_from_pdf(resume_path)
+        )
 
-        from services.llm import ask_llm
+        jd_text = clean_text(
+            extract_text_from_pdf(jd_path)
+        )
 
-        prompt = f"""
-                You are an expert AI Resume Screening Assistant.
+    except Exception as e:
 
-                Compare the following resume against the job description.
+        st.error(str(e))
+        st.stop()
 
-                Resume:
-                {resume_text}
+    existing_resume = resume_exists(
+        resume_path,
+        jd_path
+    )
 
-                Job Description:
-                {jd_text}
+    if existing_resume:
 
-                Return ONLY valid JSON.
+        st.info(
+            "ℹ️ This Resume and Job Description have already been analyzed."
+        )
+        st.stop()
 
-                Format:
+    with st.spinner("🤖 AI is analyzing the resume..."):
 
-                {{
-                    "match_percentage": 0,
-                    "strengths": [],
-                    "missing_skills": [],
-                    "recommendations": []
-                }}
-
-                Do not include markdown.
-                Do not include explanations.
-                Return JSON only.
-                """
-
-        with st.spinner("🤖 AI is analyzing the resume..."):
-            result = run_resume_pipeline(resume_text, jd_text)
-
-            parsed_resume = result["parsed_resume"]
-            analysis = result["analysis"]
-            interview_questions = result["interview_questions"]
-            learning_roadmap = result["learning_roadmap"]
-
-        existing_resume = resume_exists(resume_path,jd_path)
-
-        if existing_resume:
-            st.info("ℹ️ This Resume and Job Description have already been analyzed.")
-            st.stop()
-
-
-        resume = save_resume(
-            resume_path,
-            jd_path,
+        result = run_resume_pipeline(
             resume_text,
-            jd_text,
-            analysis["match_percentage"],
-            "\n".join(analysis["strengths"]),
-            "\n".join(analysis["missing_skills"]),
-            "\n".join(analysis["recommendations"]),
-            analysis
+            jd_text
         )
 
-        store_resume_embedding(
-            resume.id,
-            resume_text
-        )
+        analysis = result["analysis"]
+        interview_questions = result["interview_questions"]
+        learning_roadmap = result["learning_roadmap"]
 
-        st.success("✅ Resume analyzed successfully!")
+    resume = save_resume(
+        resume_path,
+        jd_path,
+        resume_text,
+        jd_text,
+        analysis["match_percentage"],
+        "\n".join(analysis["strengths"]),
+        "\n".join(analysis["missing_skills"]),
+        "\n".join(analysis["recommendations"]),
+        analysis
+    )
 
-        tab1, tab2, tab3, tab4 = st.tabs(
+    store_resume_embedding(
+        resume.id,
+        resume_text
+    )
+
+    st.success("✅ Resume analyzed successfully!")
+
+    # -----------------------------
+    # Result Tabs
+    # -----------------------------
+
+    tab1, tab2, tab3 = st.tabs(
         [
             "📊 Analysis",
             "🎤 Interview",
-            "🛣️ Roadmap",
-            "⚙️ Advanced"
+            "🛣️ Roadmap"
         ]
     )
+
+    # -----------------------------
+    # Analysis Tab
+    # -----------------------------
 
     with tab1:
 
@@ -167,106 +191,22 @@ if analyze_button:
         for item in analysis["recommendations"]:
             st.write(f"• {item}")
 
+    # -----------------------------
+    # Interview Tab
+    # -----------------------------
+
     with tab2:
 
         st.subheader("🎤 AI Interview Questions")
 
         st.write(interview_questions)
 
+    # -----------------------------
+    # Roadmap Tab
+    # -----------------------------
+
     with tab3:
 
         st.subheader("🛣️ Personalized Learning Roadmap")
 
         st.write(learning_roadmap)
-
-    with tab4:
-        
-        # -----------------------------
-        # Resume Text
-        # -----------------------------
-
-        st.subheader("📄 Resume Text")
-
-        st.text_area(
-            "Extracted Resume",
-            resume_text,
-            height=250,
-            key="current_resume"
-        )
-
-        st.subheader("💼 Job Description Text")
-
-        st.text_area(
-            "Extracted JD",
-            jd_text,
-            height=250,
-            key="current_jd"
-        )
-
-        st.divider()
-
-        st.write(f"**Total Embeddings Stored:** {get_embedding_count()}")
-
-        # -----------------------------
-        # Stored Resume List
-        # -----------------------------
-
-        all_resumes = get_all_resumes()
-
-        st.subheader("📋 Stored Resumes")
-
-        resume_data = []
-
-        for resume in all_resumes:
-            resume_data.append(
-                {
-                    "ID": resume.id,
-                    "Resume Path": resume.resume_path,
-                    "Uploaded At": resume.created_at,
-                    "Match %": resume.match_percentage
-                }
-            )
-
-        df = pd.DataFrame(resume_data)
-
-        st.dataframe(
-            df,
-            use_container_width=True,
-            hide_index=True
-        )
-
-        # -----------------------------
-        # Previous Analyses
-        # -----------------------------
-
-        if len(all_resumes) > 1:
-
-            st.divider()
-
-            st.subheader("📚 Previous AI Analyses")
-
-            for previous_resume in reversed(all_resumes):
-
-                st.divider()
-
-                st.subheader(f"Resume #{previous_resume.id}")
-
-                st.metric(
-                    "Match Percentage",
-                    f"{previous_resume.analysis_json['match_percentage']}%"
-                )
-
-                st.subheader("✅ Strengths")
-
-                for strength in previous_resume.analysis_json["strengths"]:
-                    st.write(f"• {strength}")
-
-                st.subheader("❌ Missing Skills")
-
-                for skill in previous_resume.analysis_json["missing_skills"]:
-                    st.write(f"• {skill}")
-
-                st.subheader("💡 Recommendations")
-
-                for recommendation in previous_resume.analysis_json["recommendations"]:
-                    st.write(f"• {recommendation}")        
