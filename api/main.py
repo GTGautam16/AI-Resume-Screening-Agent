@@ -4,6 +4,7 @@ from services.pdf_reader import (
     extract_text_from_pdf,
     clean_text
 )
+from services.database import save_resume
 from agents.planner import run_resume_pipeline
 
 from pydantic import BaseModel
@@ -55,11 +56,25 @@ async def analyze_resume(
         jd_text
     )
 
+    analysis = result["analysis"]
+
+    save_resume(
+        resume_path=resume_path,
+        jd_path=jd_path,
+        resume_text=resume_text,
+        jd_text=jd_text,
+        match_percentage=analysis["match_percentage"],
+        strengths="\n".join(analysis["strengths"]),
+        missing_skills="\n".join(analysis["missing_skills"]),
+        recommendations="\n".join(analysis["recommendations"]),
+        analysis_json=analysis
+    )
+
     return {
-    "analysis": result.get("analysis"),
-    "interview_questions": result.get("interview_questions"),
-    "learning_roadmap": result.get("learning_roadmap")
-}
+        "analysis": result.get("analysis"),
+        "interview_questions": result.get("interview_questions"),
+        "learning_roadmap": result.get("learning_roadmap")
+    }
 
 @app.post("/search")
 async def search_resume(request: SearchRequest):
