@@ -49,29 +49,29 @@ analyze_button = st.button(
 # Semantic Search
 # -----------------------------
 
-st.subheader("🔍 Semantic Resume Search")
+# st.subheader("🔍 Semantic Resume Search")
 
-search_query = st.text_input(
-    "Search resumes using natural language"
-)
+# search_query = st.text_input(
+#     "Search resumes using natural language"
+# )
 
-search_button = st.button("Search")
+# search_button = st.button("Search")
 
-if search_button and search_query:
+# if search_button and search_query:
 
-    with st.spinner("Searching resumes..."):
+#     with st.spinner("Searching resumes..."):
 
-        response = requests.post(
-            f"{API_URL}/search",
-            json={
-                "query": search_query
-            }
-        )
+#         response = requests.post(
+#             f"{API_URL}/search",
+#             json={
+#                 "query": search_query
+#             }
+#         )
 
-        answer = response.json()["answer"]
+#         answer = response.json()["answer"]
 
-    st.subheader("🤖 AI Answer")
-    st.write(answer)
+#     st.subheader("🤖 AI Answer")
+#     st.write(answer)
 
 # -----------------------------
 # Resume Analysis
