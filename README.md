@@ -199,4 +199,5 @@ LinkedIn:
 https://linkedin.com/in/gautam-gupta-it
 
 Website:
-https://ai-resume-screening-agent-api.onrender.com
+FASTAPI (Backend) : https://ai-resume-screening-agent-api.onrender.com/docs
+Streamlit (Frontend) : https://ai-resume-screening-agent-6nlmnxqb8o7vovrwstun2u.streamlit.app/
